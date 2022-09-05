@@ -1,64 +1,81 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Opportunities
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Tecnologias Utilizadas
 
-## About Laravel
+- Php
+- Laravel
+- Mysql
+- Docker
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+# Requisitos
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Php 8
+- Composer
+- Docker
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+# Instalação
 
-## Learning Laravel
+- No Terminal rodar o comando:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```sh
+composer install --ignore-platform-reqs
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Apos instalar as dependencias utilizaremos o Laravel Sail (uma interface de linha de comando para o Docker)
+- Verifique se a env esta configurada pois o Sail builda o container utilizando as variaveis da env (vou estar subindo a env com uma configuração padrao para facilitar o setup)
+- No Terminal rodar o comando:
 
-## Laravel Sponsors
+```sh
+./vendor/bin/sail up -d
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+- Acessar o bash do container:
 
-### Premium Partners
+```sh
+./vendor/bin/sail exec laravel.test bash
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+- Para garantir que as dependencias estejam atualizadas de acordo com o container eu gosto de rodar o comando de instalação das dependencias dentro do container sem a necessidade do --ignore-platform-reqs
 
-## Contributing
+```sh
+composer install 
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+ou
 
-## Code of Conduct
+```sh
+composer update 
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- Apos finalizar a instalação, rodar o comando de criação das tabelas do banco junto com as seeds
 
-## Security Vulnerabilities
+```sh
+php artisan migrate --seed
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- Para simular a importação, deixei um arquivo csv com os dados requeridos para os testes.
+- Disponibilizei a collection do postman contendo a rota para importar
 
-## License
+- A rota para importação é:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```
+Post localhost/api/v1/freights/import
+```
+
+- Como campos obrigatorios ela tem o client_id, que é o id de um cliente cadastrado no sistema (ao rodar as seeds do sistema anteriormente foram cadastrados 2 clientes, com os ids 1 e 2 respectivamente), e o attachment, que é o arquivo csv a ser importado.
+
+- Apos enviar a requisição, por motivos de otimização do sistema, a importação foi colocada em uma fila.
+
+- Para executar a fila, acesse o terminal e execute o comando:
+
+```sh
+php artisan queue:work
+```
+
+ou, caso esteja fora do bash do container
+
+```sh
+./vendor/bin/sail php artisan queue:work
+```
+
+- Pronto, os jobs começarão a serem executados e a importação sera iniciada.
